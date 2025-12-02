@@ -1,0 +1,45 @@
+pipeline {
+    agent any
+
+    stages {
+
+        stage('Setup Environment') {
+            steps {
+                sh '''
+                python3 -m venv venv
+                source venv/bin/activate
+                pip install --upgrade pip
+                pip install -r requirements.txt
+                '''
+            }
+        }
+
+        stage('Run Tests on Chrome & Edge') {
+            parallel {
+                stage('Chrome Execution') {
+                    steps {
+                        sh '''
+                        source venv/bin/activate
+                        pytest --browser=chrome --headed --junitxml=reports/chrome.xml
+                        '''
+                    }
+                }
+
+                stage('Edge Execution') {
+                    steps {
+                        sh '''
+                        source venv/bin/activate
+                        pytest --browser=edge --headed --junitxml=reports/edge.xml
+                        '''
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            junit 'reports/*.xml'
+        }
+    }
+}
