@@ -5,12 +5,8 @@ pipeline {
 
         stage('Setup Environment') {
             steps {
-                sh '''
-                python3 -m venv venv
-                source venv/bin/activate
-                pip install --upgrade pip
-                pip install -r requirements.txt
-                '''
+                bat 'python --version'
+                bat 'pip install -r requirements.txt'
             }
         }
 
@@ -18,19 +14,12 @@ pipeline {
             parallel {
                 stage('Chrome Execution') {
                     steps {
-                        sh '''
-                        source venv/bin/activate
-                        pytest --browser=chrome --headed --junitxml=reports/chrome.xml
-                        '''
+                        bat 'pytest tests --browser=chrome --junitxml=reports/chrome/report.xml'
                     }
                 }
-
                 stage('Edge Execution') {
                     steps {
-                        sh '''
-                        source venv/bin/activate
-                        pytest --browser=edge --headed --junitxml=reports/edge.xml
-                        '''
+                        bat 'pytest tests --browser=edge --junitxml=reports/edge/report.xml'
                     }
                 }
             }
@@ -39,7 +28,7 @@ pipeline {
 
     post {
         always {
-            junit 'reports/*.xml'
+            junit 'reports/**/*.xml'
         }
     }
 }
