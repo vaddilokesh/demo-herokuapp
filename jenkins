@@ -12,16 +12,23 @@ pipeline {
 
         stage('Run Tests on Chrome & Edge') {
             parallel {
+
                 stage('Chrome Execution') {
                     steps {
-                        bat 'pytest tests --browser=chrome --junitxml=reports/chrome/report.xml'
+                        dir('chrome_run') {
+                            bat 'pytest ../tests --browser=chrome --junitxml=../reports/chrome/report.xml'
+                        }
                     }
                 }
+
                 stage('Edge Execution') {
                     steps {
-                        bat 'pytest tests --browser=edge --junitxml=reports/edge/report.xml'
+                        dir('edge_run') {
+                            bat 'pytest ../tests --browser=edge --junitxml=../reports/edge/report.xml'
+                        }
                     }
                 }
+
             }
         }
     }
